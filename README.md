@@ -2,6 +2,8 @@
 
 Pipeline de **seguridad shift-left** que integra tres capas de análisis automático como *quality gates*: **SAST** (análisis estático del código), **SCA** (vulnerabilidades en dependencias) y **DAST** (pruebas dinámicas sobre la aplicación corriendo).
 
+![DevSecOps](https://github.com/fercarballo/devsecops-pipeline/actions/workflows/devsecops.yml/badge.svg)
+
 ---
 
 ## Resumen ejecutivo
@@ -108,9 +110,25 @@ semgrep --config security/semgrep-rules.yml security/examples-insecure # detecci
 
 ---
 
-## Contexto
+## La suite completa
 
-Parte de una serie de proyectos de automatización de calidad orientados a perfiles QA Automation y SDET, con foco en **seguridad integrada al ciclo de desarrollo**.
+Este repositorio forma parte de una suite de automatización de calidad que cubre el ciclo de testing de punta a punta, de los fundamentos a las prácticas propias de un rol SDET.
+
+**Fundamentos**
+
+1. [Framework E2E de UI](https://github.com/fercarballo/playwright-e2e-framework-saucedemo) — Playwright · Page Object Model
+2. [Testing de API](https://github.com/fercarballo/api-testing-framework-restful-booker) — contract testing con Zod
+3. [Pipeline CI/CD](https://github.com/fercarballo/qa-automation-cicd-pipeline) — GitHub Actions · quality gates
+4. [Estabilidad y flakiness](https://github.com/fercarballo/flakiness-hunting-playwright) — detección y erradicación
+5. [Regresión visual & contract testing](https://github.com/fercarballo/visual-and-contract-testing) — Playwright + Pact
+
+**Avanzado (SDET)**
+
+6. [Performance & load testing](https://github.com/fercarballo/performance-testing-k6) — k6 · thresholds como gate
+7. [Integración con dependencias reales](https://github.com/fercarballo/integration-testing-testcontainers) — Testcontainers · Postgres
+8. **DevSecOps** — este repositorio
+9. [Tooling interno de QA](https://github.com/fercarballo/qa-insights) — test impact + flaky detection
+10. [Evals de aplicaciones con IA](https://github.com/fercarballo/llm-evals-harness) — LLM testing
 
 ---
 
