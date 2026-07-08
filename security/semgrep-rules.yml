@@ -1,0 +1,38 @@
+# Reglas de SAST (Semgrep) — locales y deterministas (sin depender del registry).
+# Detectan anti-patrones de seguridad comunes en JavaScript/TypeScript.
+rules:
+  - id: node-command-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      Posible command injection: exec() con entrada dinámica. Usar execFile con
+      argumentos separados o validar/allow-listar la entrada.
+    patterns:
+      - pattern-either:
+          - pattern: child_process.exec(`...${$X}...`, ...)
+          - pattern: exec(`...${$X}...`, ...)
+          - pattern: child_process.exec($A + $B, ...)
+          - pattern: exec($A + $B, ...)
+
+  - id: sql-injection-string-concat
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      Posible SQL injection: query construida por concatenación/interpolación.
+      Usar consultas parametrizadas.
+    patterns:
+      - pattern-either:
+          - pattern: $DB.query(`...${$X}...`, ...)
+          - pattern: $DB.query($A + $B, ...)
+
+  - id: use-of-eval
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: "Uso de eval(): ejecuta código arbitrario. Evitarlo."
+    pattern: eval(...)
+
+  - id: hardcoded-secret
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: "Posible secreto hardcodeado. Usar variables de entorno / gestor de secretos."
+    pattern-regex: '(?i)(password|secret|api_?key|access_token)\s*=\s*[''"][^''"]{8,}[''"]'

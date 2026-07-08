@@ -1,0 +1,51 @@
+# Pipeline DevSecOps: tres capas de seguridad como gates, en paralelo.
+#   SAST  → análisis estático del código (Semgrep)
+#   SCA   → vulnerabilidades en dependencias (npm audit)
+#   DAST  → pruebas dinámicas de seguridad contra la app corriendo
+name: DevSecOps
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sast:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Gate: el código de la app debe estar limpio. --error → exit != 0 si hay hallazgos.
+      - name: Semgrep — gate sobre src/ (debe estar limpio)
+        run: docker run --rm -v "$PWD:/repo" -w /repo semgrep/semgrep semgrep --config security/semgrep-rules.yml src/ --error
+      # Informativo: demuestra que las reglas SÍ detectan los anti-patrones.
+      - name: Semgrep — demostración de detección (ejemplos vulnerables)
+        run: docker run --rm -v "$PWD:/repo" -w /repo semgrep/semgrep semgrep --config security/semgrep-rules.yml security/examples-insecure/
+
+  sca:
+    name: SCA (dependencias)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci || (sleep 10 && npm ci)
+      - name: Gate SCA (falla en vulnerabilidades high/critical)
+        run: npm run sca
+
+  dast:
+    name: Pruebas dinámicas de seguridad
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci || (sleep 10 && npm ci)
+      - run: npm run typecheck
+      - name: Pruebas dinámicas de seguridad contra la app
+        run: npm test
